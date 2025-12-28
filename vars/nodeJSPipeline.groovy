@@ -83,7 +83,7 @@ def call(Map configMap){
                     script{
                         /* Use sh """ when you want to use Groovy variables inside the shell.
                         Use sh ''' when you want the script to be treated as pure shell. */
-                        sh """
+                        sh '''
                         echo "Fetching Dependabot alerts..."
 
                         response=$(curl -s \
@@ -115,7 +115,7 @@ def call(Map configMap){
                         else
                             echo "✅ No OPEN HIGH/CRITICAL Dependabot alerts found"
                         fi
-                        """
+                        '''
                         
                     }
                 }
