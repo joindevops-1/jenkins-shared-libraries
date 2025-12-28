@@ -68,7 +68,10 @@ def call(Map configMap){
                     }
                 }
             } */
-            /* stage('Dependabot Security Gate') {
+            stage('Dependabot Security Gate') {
+                when {
+                    expression { false }   // 👈 toggle here
+                }
                 environment {
                     GITHUB_OWNER = 'daws-86s'
                     GITHUB_REPO  = 'catalogue'
@@ -80,7 +83,7 @@ def call(Map configMap){
                     script{
                         /* Use sh """ when you want to use Groovy variables inside the shell.
                         Use sh ''' when you want the script to be treated as pure shell. */
-                        sh '''
+                        sh """
                         echo "Fetching Dependabot alerts..."
 
                         response=$(curl -s \
@@ -112,11 +115,11 @@ def call(Map configMap){
                         else
                             echo "✅ No OPEN HIGH/CRITICAL Dependabot alerts found"
                         fi
-                        '''
+                        """
                         
                     }
                 }
-            } */
+            } 
 
             stage('Build Image') {
                 steps {
