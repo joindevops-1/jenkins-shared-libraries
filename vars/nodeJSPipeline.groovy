@@ -6,6 +6,9 @@ def call(Map configMap){
                 label 'AGENT-1'
             }
         }
+        parameters {
+            booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
+        }
         environment {
             COURSE = "Jenkins"
             appVersion = ""
@@ -150,6 +153,22 @@ def call(Map configMap){
                     }
                 }
             } */
+            stage('Trigger Deploy') {
+                when{
+                    expression { params.deploy }
+                }
+                steps {
+                    script {
+                        build job: "${COMPONENT}-deploy",
+                        parameters: [
+                            string(name: 'appVersion', value: "${appVersion}"),
+                            string(name: 'deploy_to', value: 'dev')
+                        ],
+                        propagate: false,  // even SG fails VPC will not be effected
+                        wait: false // VPC will not wait for SG pipeline completion
+                    }
+                }
+            }
         }
 
         
