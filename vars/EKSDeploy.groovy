@@ -34,7 +34,7 @@ def call (Map configMap){
                                 aws eks update-kubeconfig --region ${REGION} --name ${PROJECT}-${deploy_to}
                                 kubectl get nodes
                                 ls -l
-                                sed -i "s/IMAGE_VERSION/${appVersion}/g" values-${deploy_to}.yaml
+                                sed -i "s/IMAGE_VERSION/${appVersion}/g" values.yaml
                                 helm upgrade --install $COMPONENT -f values-${deploy_to}.yaml -n $PROJECT .
                             """
                         }
