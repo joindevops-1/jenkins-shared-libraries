@@ -1,4 +1,4 @@
-def call (){
+def call (Map configMap){
     pipeline {
     // These are pre-build sections
         agent {
