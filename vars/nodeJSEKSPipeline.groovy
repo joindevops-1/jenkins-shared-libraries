@@ -1,4 +1,5 @@
-def call(Map configMap){
+// call is the default function name
+def call (Map configMap){
     pipeline {
     // These are pre-build sections
         agent {
@@ -6,21 +7,18 @@ def call(Map configMap){
                 label 'AGENT-1'
             }
         }
-        parameters {
-            booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
-        }
         environment {
             COURSE = "Jenkins"
             appVersion = ""
             ACC_ID = "160885265516"
-            PROJECT = configMap.get('project')
-            COMPONENT = configMap.get('component')
+            PROJECT = configMap.get("project")
+            COMPONENT = configMap.get("component")
         }
         options {
             timeout(time: 10, unit: 'MINUTES') 
             disableConcurrentBuilds()
         }
-    // This is build section
+        // This is build section
         stages {
             stage('Read Version') {
                 steps {
@@ -44,7 +42,7 @@ def call(Map configMap){
                 steps {
                     script{
                         sh """
-                            echo test
+                            npm test
                         """
                     }
                 }
@@ -73,7 +71,7 @@ def call(Map configMap){
             } */
             stage('Dependabot Security Gate') {
                 when {
-                    expression { false }   // 👈 toggle here
+                    expression { false }
                 }
                 environment {
                     GITHUB_OWNER = 'daws-86s'
@@ -122,7 +120,7 @@ def call(Map configMap){
                         
                     }
                 }
-            } 
+            }
 
             stage('Build Image') {
                 steps {
@@ -138,6 +136,7 @@ def call(Map configMap){
                     }
                 }
             }
+            
             /* stage('Trivy Scan'){
                 steps {
                     script{
@@ -153,25 +152,24 @@ def call(Map configMap){
                     }
                 }
             } */
-            stage('Trigger Deploy') {
-                when{
-                    expression { params.deploy }
-                }
+
+            stage('Trigger DEV Deploy') {
                 steps {
                     script {
-                        build job: "../${COMPONENT}-deploy",
-                        parameters: [
-                            string(name: 'appVersion', value: "${appVersion}"),
-                            string(name: 'deploy_to', value: 'dev')
-                        ],
-                        propagate: false,  // even SG fails VPC will not be effected
-                        wait: false // VPC will not wait for SG pipeline completion
+                        build job: '../catalogue-deploy',
+                            wait: false, // Wait for completion
+                            propagate: false, // Propagate status
+                            parameters: [
+                                string(name: 'appVersion', value: "${appVersion}"),
+                                string(name: 'deploy_to', value: "dev")
+                            ]
                     }
                 }
             }
+
         }
 
-        
+            
 
         post{
             always{
