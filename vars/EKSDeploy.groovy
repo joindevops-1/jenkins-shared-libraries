@@ -31,9 +31,11 @@ def call (Map configMap){
                     script{
                         withAWS(region:'us-east-1',credentials:'aws-creds') {
                             sh """
-                                aws eks update-kubeconfig --region ${REGION} --name ${PROJECT}-${params.deploy_to}
+                                aws eks update-kubeconfig --region ${REGION} --name ${PROJECT}-${deploy_to}
                                 kubectl get nodes
                                 ls -l
+                                sed -i "s/IMAGE_VERSION/${appVersion}/g" values-${deploy_to}.yaml
+                                helm upgrade --install $COMPONENT -f values-${deploy_to}.yaml -n $PROJECT .
                             """
                         }
                     }
